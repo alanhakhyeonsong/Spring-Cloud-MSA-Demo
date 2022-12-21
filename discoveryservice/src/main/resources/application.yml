@@ -1,0 +1,21 @@
+# eureka server가 웹서비스의 성격으로 구동됨
+# 포트 번호 지정
+server:
+  port: 8761
+
+# 마이크로서비스를 담당하는 스프링 부트 프레임 워크에
+# 각각의 마이크로서비스에 고유한 아이디를 부여하는 설명
+spring:
+  application:
+    name: discoveryservice
+
+# client 설정 부분
+# 현재 eureka server를 구동하는데 client 설정은 필요하지 않다.
+# eureka 라이브러리가 포함된 채 스프링 부트가 구동되면 기본적으로 eureka 클라이언트의 역할로서 어딘가에 등록하는 작업을 시도함.
+# 아래 설정들은 default가 true로 현재 프로젝트를 client의 역할로 전화번호부에 등록하는 것과 같음
+# 현재 프로젝트는 서버(전화번호부)가 될 것인데 자신의 정보를 자신에게 등록하는 현상이 된다.
+# 따라서 의미 없는 작업이므로 false로 세팅한다.
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
