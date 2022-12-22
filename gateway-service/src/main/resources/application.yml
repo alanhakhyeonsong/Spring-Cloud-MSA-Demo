@@ -1,0 +1,30 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway GlobalFilter
+            preLogger: true
+            postLogger: true
+      routes: # 라우팅 설정
+        - id: user-service # 구분하기 위한 id값으로 임의로 작성해도 무관함
+          predicates:
+            - Path=/user-service/** # first-service/ 으로 요청이 들어오는 경우
+          uri: lb://USER-SERVICE # eureka server에서 first-service를 찾아서 그곳으로 요청을 보낸다.
+          filters:
+#            - AddRequestHeader=first-request, first-request-header2
+#            - AddResponseHeader=first-response, first-response-header2
+            - CustomFilter

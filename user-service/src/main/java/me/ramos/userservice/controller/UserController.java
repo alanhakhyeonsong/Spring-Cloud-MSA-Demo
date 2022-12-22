@@ -8,21 +8,23 @@ import me.ramos.userservice.vo.Greeting;
 import me.ramos.userservice.vo.ResponseUser;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/user-service")
 @RequiredArgsConstructor
 public class UserController {
 
     private final Greeting greeting;
+    private final Environment env;
     private final UserService userService;
 
     @GetMapping("/health-check")
     public String status() {
-        return "It's Working in User Service";
+        return String.format("It's Working in User Service on PORT %s", env.getProperty("local.server.port"));
     }
 
     @GetMapping("/welcome")
