@@ -1,29 +1,52 @@
 package me.ramos.userservice.config;
 
+import me.ramos.userservice.filter.AuthenticationFilter;
+import me.ramos.userservice.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.authorizeRequests()
-                .antMatchers("/users/**").permitAll()
-                    .and()
-                .csrf()
-                    .disable()
-                .headers()
-                    .frameOptions()
-                    .disable()
-                    .and()
-                .build();
+    private UserService userService;
+    private Environment env;
+
+    public SecurityConfig(@Lazy UserService userService, Environment env) {
+        this.userService = userService;
+        this.env = env;
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+
+        http.authorizeRequests().antMatchers("/**")
+                .hasIpAddress("127.0.0.1") // TODO: IP Address Issue 있음. 403 Forbidden
+                .and()
+                .addFilter(getAuthenticationFilter());
+
+        http.headers().frameOptions().disable();
+    }
+
+    private AuthenticationFilter getAuthenticationFilter() throws Exception {
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter();
+        authenticationFilter.setAuthenticationManager(authenticationManager());
+
+        return authenticationFilter;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
     }
 
     @Bean
