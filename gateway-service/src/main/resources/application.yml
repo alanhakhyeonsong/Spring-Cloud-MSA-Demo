@@ -19,12 +19,36 @@ spring:
             baseMessage: Spring Cloud Gateway GlobalFilter
             preLogger: true
             postLogger: true
-      routes: # 라우팅 설정
-        - id: user-service # 구분하기 위한 id값으로 임의로 작성해도 무관함
+      routes:
+        - id: user-service
           predicates:
-            - Path=/user-service/** # first-service/ 으로 요청이 들어오는 경우
-          uri: lb://USER-SERVICE # eureka server에서 first-service를 찾아서 그곳으로 요청을 보낸다.
+            - Path=/user-service/login
+            - Method=POST
+          uri: lb://USER-SERVICE
           filters:
-#            - AddRequestHeader=first-request, first-request-header2
-#            - AddResponseHeader=first-response, first-response-header2
-            - CustomFilter
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        - id: user-service
+          predicates:
+            - Path=/user-service/users
+            - Method=POST
+          uri: lb://USER-SERVICE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        - id: user-service
+          predicates:
+            - Path=/user-service/**
+            - Method=GET
+          uri: lb://USER-SERVICE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        - id: catalog-service
+          predicates:
+            - Path=/catalog-service/**
+          uri: lb://CATALOG-SERVICE
+        - id: order-service
+          predicates:
+            - Path=/order-service/**
+          uri: lb://ORDER-SERVICE
