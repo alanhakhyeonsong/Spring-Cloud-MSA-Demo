@@ -29,9 +29,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
 
-        http.authorizeRequests().antMatchers("/**")
-                .hasIpAddress("127.0.0.1") // TODO: IP Address Issue 있음. 403 Forbidden
-                .and()
+        http.authorizeRequests()
+                .antMatchers("/error/**")
+                    .permitAll()
+                .antMatchers("/**")
+                    .hasIpAddress("127.0.0.1")
+                    .and()
                 .addFilter(getAuthenticationFilter());
 
         http.headers().frameOptions().disable();
