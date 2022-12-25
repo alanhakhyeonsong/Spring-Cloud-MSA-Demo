@@ -21,29 +21,30 @@ spring:
             postLogger: true
       routes:
         - id: user-service
+          uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/login
             - Method=POST
-          uri: lb://USER-SERVICE
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
         - id: user-service
+          uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/users
             - Method=POST
-          uri: lb://USER-SERVICE
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
         - id: user-service
+          uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/**
             - Method=GET
-          uri: lb://USER-SERVICE
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
         - id: catalog-service
           predicates:
             - Path=/catalog-service/**
@@ -52,3 +53,6 @@ spring:
           predicates:
             - Path=/order-service/**
           uri: lb://ORDER-SERVICE
+
+token:
+  secret: user_token
